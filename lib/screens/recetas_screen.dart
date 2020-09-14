@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../dummy_data.dart';
 
 class RecetasScreen extends StatelessWidget {
+  final Function marcaFavorito;
+  final Function esFavorito;
+  RecetasScreen(this.marcaFavorito, this.esFavorito);
+
   static const routeName = '/receta-plato';
 
   Widget _buildTitulosSecciones(BuildContext ctx, String texto) {
@@ -23,9 +27,9 @@ class RecetasScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       height: 148,
-      width: 310,
-      margin: const EdgeInsets.all(5),
-      padding: const EdgeInsets.all(7),
+      width: 240,
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 3),
       child: child,
     );
   }
@@ -58,7 +62,7 @@ class RecetasScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       vertical: 2,
-                      horizontal: 10,
+                      horizontal: 5,
                     ),
                     child: Text(
                       platoSeleccionado.ingredientes[posicion],
@@ -90,6 +94,13 @@ class RecetasScreen extends StatelessWidget {
               ),
             )
           ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => marcaFavorito(idPlato),
+        child: Icon(
+          esFavorito(idPlato) ? Icons.star : Icons.star_border,
         ),
       ),
     );

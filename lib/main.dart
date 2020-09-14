@@ -15,7 +15,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-//filtros default para cuando iniciamos la app
+  ////////////////////////////////
+//filtros y listas default para cuando iniciamos la app
+///////////////////////////////
+  ///
   Map<String, bool> _filtros = {
     'gluten': false,
     'lactosa': false,
@@ -26,10 +29,18 @@ class _MyAppState extends State<MyApp> {
   List<Plato> _platosMostrados = DUMMY_PLATOS;
   List<Plato> _platosFavoritos = [];
 
-  void _filtrar(Map<String, bool> valoresFiltros) {
+  ///////////////////////////////////////////////
+//  Este metodo debe ser llamado al apretar el boton, el cual esta en la screen de filtros
+///////////////////////////////////////////////////
+  ///
+  void _aplicarFiltros(Map<String, bool> valoresFiltros) {
     setState(() {
       _filtros = valoresFiltros;
       _platosMostrados = DUMMY_PLATOS.where((plato) {
+        ////////////////////////////////////////////////////////////////////////////
+        //    si en los filtros actuales gluten only es true y el plato no es libre de gluten,
+        ///     no se incluye en los platos mostrados por la app
+        ////////////////////////////////////////////////////////////////////////////////
         if (_filtros['gluten'] && !plato.esLibreDeGluten) {
           return false;
         }
@@ -45,6 +56,33 @@ class _MyAppState extends State<MyApp> {
         return true;
       }).toList();
     });
+  }
+
+  //////////////////////////////////////////////////
+  ///  Logica para agregar o eliminar elementos a los platos favoritos
+  ///   indexwhere retorna -1 si el valor de la condicion es falso, o el index del plato en la lista de ser verdadero
+  //////////////////////////////////////////////////
+  void _toggleFavorito(String platoId) {
+    final idExistente =
+        _platosFavoritos.indexWhere((plato) => plato.id == platoId);
+    if (idExistente >= 0) {
+      setState(() {
+        _platosFavoritos.removeAt(idExistente);
+      });
+    } else {
+      setState(() {
+        _platosFavoritos.add(
+          DUMMY_PLATOS.firstWhere((plato) => plato.id == platoId),
+        );
+      });
+    }
+  }
+  ///////////////////////////////////////////////////
+  ///  any retorna true si un plato (referenciamos por el id) esta en la lista de favoritos
+  ///////////////////////////////////////////////
+
+  bool _esPlatoFavorito(String platoId) {
+    return _platosFavoritos.any((plato) => plato.id == platoId);
   }
 
   @override
@@ -69,13 +107,23 @@ class _MyAppState extends State<MyApp> {
                     fontWeight: FontWeight.bold,
                     fontSize: 20),
               )),
+      ////////////////////////////////////////////////
+      ///  A traves de las namedRoutes pasamos los datos que se necesiten
+      ///   con la ayuda de los constructores
+      ////////////////////////////////////////////////
       routes: {
         '/': (ctx) => TabsScreen(_platosFavoritos),
         PlatosCategoriaScreen.routeName: (ctx) =>
             PlatosCategoriaScreen(_platosMostrados),
-        RecetasScreen.routeName: (ctx) => RecetasScreen(),
-        FiltrosScreen.routeName: (ctx) => FiltrosScreen(_filtros, _filtrar),
+        RecetasScreen.routeName: (ctx) =>
+            RecetasScreen(_toggleFavorito, _esPlatoFavorito),
+        FiltrosScreen.routeName: (ctx) =>
+            FiltrosScreen(_filtros, _aplicarFiltros),
       },
+      ///////////////////////////////////////////////////////
+      ///   Se usa para llevar al usuario a alguna pantalla
+      ///      si es que olvide agregarla a las rutas
+      ///////////////////////////////////////////////////////
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
           builder: (context) => CategoriaScreen(),

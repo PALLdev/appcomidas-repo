@@ -14,11 +14,18 @@ class FiltrosScreen extends StatefulWidget {
 }
 
 class _FiltrosScreenState extends State<FiltrosScreen> {
+  ////////////////////////////////////
+  ///   Como default en la app no hay filtros aplicados
+  ///////////////////////////////////
+  ///
   var _glutenfree = false;
   var _lactosafree = false;
   var _vegano = false;
   var _vegetariano = false;
 
+  ////////////////////////////////////
+  ///  Para iniciar el screen con los filtros seleccionados por el usuario
+  ///////////////////////////////////
   @override
   initState() {
     super.initState();
@@ -28,6 +35,9 @@ class _FiltrosScreenState extends State<FiltrosScreen> {
     _vegetariano = widget._filtrosActuales['vegetariano'];
   }
 
+  ////////////////////////////////////
+  ///  Construir una opcion de filtro visualmente
+  ///////////////////////////////////
   Widget _buildFiltro(
       bool valor, String titulo, String descripcion, Function cambiarValor) {
     return SwitchListTile(
@@ -43,6 +53,26 @@ class _FiltrosScreenState extends State<FiltrosScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Preferencias'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.save,
+            ),
+            ////////////////////////////////////////////////
+            ///  Metodo esta donde se maneja la logica de los filtros en este caso main.dart
+            ///  y necesita un map de los valores de filtros que selecciono el usuario
+            //////////////////////////////////////////////
+            onPressed: () {
+              final filtrosSeleccionados = {
+                'gluten': _glutenfree,
+                'lactosa': _lactosafree,
+                'vegano': _vegano,
+                'vegetariano': _vegetariano,
+              };
+              widget._guardarFiltros(filtrosSeleccionados);
+            },
+          ),
+        ],
       ),
       drawer: InicioDrawer(),
       body: Column(
@@ -125,7 +155,7 @@ class _FiltrosScreenState extends State<FiltrosScreen> {
               };
               widget._guardarFiltros(filtrosSeleccionados);
             },
-            child: Text('Aplicar filtros'),
+            child: Text('Guardar cambios'),
           ),
         ],
       ),
